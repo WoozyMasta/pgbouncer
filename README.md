@@ -1,5 +1,27 @@
 # PgBouncer docker
 
+![GitHub last commit](https://img.shields.io/github/last-commit/WoozyMasta/pgbouncer?style=flat-square)
+
+```bash
+docker pull woozymasta/pgbouncer:latest-cares
+docker pull woozymasta/pgbouncer:latest-udns
+```
+
+[DockerHub](https://hub.docker.com/r/woozymasta/pgbouncer)
+
+![Docker Pulls](https://img.shields.io/docker/pulls/woozymasta/pgbouncer?style=flat-square)
+![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/woozymasta/pgbouncer?sort=semver&style=flat-square)
+
+```bash
+docker pull woozymasta/pgbouncer-exporter:latest
+```
+
+[DockerHub](https://hub.docker.com/r/woozymasta/pgbouncer-exporter)
+
+![Docker Pulls](https://img.shields.io/docker/pulls/woozymasta/pgbouncer-exporter?style=flat-square)
+![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/woozymasta/pgbouncer-exporter?sort=semver&style=flat-square)
+
+
 Run pgbouncer:
 
 ```bash
