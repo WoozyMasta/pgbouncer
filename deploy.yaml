@@ -18,7 +18,7 @@ spec:
     metadata:
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "exporter"
+        prometheus.io/port: "9127"
       labels:
         app: pgbouncer
         group: postgres

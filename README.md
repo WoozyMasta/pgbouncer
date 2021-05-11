@@ -37,9 +37,10 @@ Run pgbouncer-exporter:
 ```bash
 podman run --rm -ti \
   -p 9127:9127 \
+  -e POSTGRES_HOST=10.100.100.163 \
+  -e POSTGRES_PASSWORD=QtdhslqWctiC2KGfn2pT \
   pgbouncer-exporter \
-  --pgBouncer.connectionString="postgres://postgres:QtdhslqWctiC2KGfn2pT@192.168.100.251:5432/pgbouncer?sslmode=disable" \
-  --web.listen-address=":9127"
+
 ```
 
 ```sql
