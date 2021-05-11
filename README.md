@@ -42,5 +42,17 @@ podman run --rm -ti \
   --web.listen-address=":9127"
 ```
 
+```sql
+CREATE ROLE pgbouncer WITH LOGIN SUPERUSER PASSWORD 'pgbouncer-password';
+CREATE DATABASE pgbouncer WITH OWNER pgbouncer;
+```
+
+```bash
+kubectl create secret generic pgbouncer \
+  --from-literal="POSTGRES_PASSWORD=pgbouncer-password"
+
+kubectl apply -f deploy.yaml
+```
+
 * [Grafana Dashboard](https://grafana.com/grafana/dashboards/9760) - `9760`
 * [Grafana Dashboard](https://grafana.com/grafana/dashboards/13353) - `13353`

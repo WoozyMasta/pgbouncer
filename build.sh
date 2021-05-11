@@ -41,7 +41,8 @@ for dockerfile in ./Dockerfile.*; do
       --file "$dockerfile" \
       --build-arg "PGBOUNCER_TAG=$PGBOUNCER_TAG" \
       --build-arg "PANDOC_TAG=$PANDOC_TAG" \
-      --build-arg "EXPORTER_TAG=${EXPORTER_TAG//v}" .
+      --build-arg "EXPORTER_TAG=${EXPORTER_TAG//v}" \
+      --no-cache .
     $CMT tag "$build_tag" "$build_latest"
 
     [ "$dockerfile" == ./Dockerfile.cares ] && \
@@ -53,7 +54,7 @@ for dockerfile in ./Dockerfile.*; do
       [ "$dockerfile" == ./Dockerfile.cares ] && $CMT push "$image:latest"
     fi
 
-    image_size="$($CMT inspect pgbouncer | jq .[].Size | numfmt --to=iec)"
+    image_size="$($CMT inspect "$build_tag" | jq .[].Size | numfmt --to=iec)"
     builded[${#builded[@]}]="$build_tag $image_size"
     builded[${#builded[@]}]="$build_latest $image_size"
   fi

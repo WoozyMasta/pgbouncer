@@ -1,0 +1,119 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgbouncer
+  labels:
+    app: pgbouncer
+    group: postgres
+    role: database
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pgbouncer
+      group: postgres
+      role: database
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "exporter"
+      labels:
+        app: pgbouncer
+        group: postgres
+        role: database
+    spec:
+      enableServiceLinks: false
+      containers:
+      - name: pgbouncer
+        image: woozymasta/pgbouncer:latest
+        imagePullPolicy: Always
+        env:
+        - name: POSTGRES_HOST
+          value: "psql"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_USER
+          value: "pgbouncer"
+        - name: POSTGRES_DB
+          value: "pgbouncer"
+        - name: PGBOUNCER_AUTH_TYPE
+          value: "md5"
+        - name: PGBOUNCER_MODE
+          value: "userlist"
+        - name: PGBOUNCER_MAX_CLIENT_CONN
+          value: "500"
+        - name: PGBOUNCER_DEFAULT_POOL_SIZE
+          value: "50"
+        - name: PGBOUNCER_RESERVE_POOL_SIZE
+          value: "25"
+        envFrom:
+        - secretRef:
+            name: pgbouncer
+        ports:
+        - name: psql
+          containerPort: 5432
+          protocol: TCP
+        volumeMounts:
+        - name: pgbouncer-etc
+          mountPath: /pgbouncer/etc
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+          limits:
+            cpu: "500m"
+            memory: "500Mi"
+      - name: pgbouncer-exporter
+        image: woozymasta/pgbouncer-exporter:latest
+        imagePullPolicy: Always
+        env:
+        - name: POSTGRES_HOST
+          value: "127.0.0.1"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_USER
+          value: "pgbouncer"
+        envFrom:
+        - secretRef:
+            name: pgbouncer
+        ports:
+        - name: exporter
+          containerPort: 9127
+          protocol: TCP
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "50Mi"
+          limits:
+            cpu: "50m"
+            memory: "50Mi"
+      volumes:
+        - name: pgbouncer-etc
+          emptyDir: {}
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: pgbouncer
+  labels:
+    app: pgbouncer
+    group: postgres
+    role: database
+spec:
+  type: LoadBalancer
+  ports:
+    - name: psql
+      protocol: TCP
+      port: 5432
+      targetPort: psql
+    - name: exporter
+      protocol: TCP
+      port: 9127
+      targetPort: exporter
+  selector:
+    app: pgbouncer
+    group: postgres
+    role: database

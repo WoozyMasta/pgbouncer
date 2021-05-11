@@ -11,9 +11,20 @@ RUN tar xvzf \
         --strip-components 1
 
 
-FROM scratch
+FROM alpine:3.13
 
 LABEL maintainer="Woozy Masta <woozymasta@gmail.com>"
 
 COPY --from=builder /exporter/pgbouncer_exporter /pgbouncer_exporter
-ENTRYPOINT ["/pgbouncer_exporter"]
+COPY ./exporter.sh /exporter
+RUN addgroup --gid 1000 pgbouncer && \
+    adduser --disabled-password \
+            --uid 1000 \
+            --shell /bin/sh \
+            --home /pgbouncer \
+            --ingroup pgbouncer \
+            pgbouncer
+
+USER 1000
+
+ENTRYPOINT ["/exporter"]

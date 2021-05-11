@@ -1,0 +1,39 @@
+version: '3.7'
+
+x-vars: &vars
+  environment:
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "postgres"
+
+networks:
+  default:
+    name: pgbouncer-test
+
+services:
+
+  pgsql:
+    image: postgres:12-alpine
+    restart: always
+    <<: *vars
+    volumes:
+      # - ./pgsql:/var/lib/postgresql/data:Z
+      - ./psql-init.sh:/docker-entrypoint-initdb.d/psql-init.sh
+      - ./.credentials:./.credentials
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 9s
+      retries: 3
+      start_period: 10s
+
+  pgbouncer:
+    image: woozymasta/pgbouncer:latest
+    restart: always
+    <<: *vars
+    depends_on: ["pgsql"]
+
+  pgbouncer-exporter:
+    image: woozymasta/pgbouncer-exporter:latest
+    restart: always
+    <<: *vars
+    depends_on: ["pgbouncer"]
