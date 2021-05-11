@@ -55,5 +55,5 @@ kubectl create secret generic pgbouncer \
 kubectl apply -f deploy.yaml
 ```
 
-* [Grafana Dashboard](https://grafana.com/grafana/dashboards/9760) - `9760`
+* [Grafana Dashboard](https://grafana.com/grafana/dashboards/10945) - `10945`
 * [Grafana Dashboard](https://grafana.com/grafana/dashboards/13353) - `13353`
