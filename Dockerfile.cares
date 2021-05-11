@@ -1,0 +1,73 @@
+FROM alpine:3.13 AS builder
+
+ARG PGBOUNCER_TAG=pgbouncer_1_15_0
+ARG PANDOC_TAG=2.11.4
+
+RUN wget https://github.com/jgm/pandoc/releases/download/$PANDOC_TAG/pandoc-$PANDOC_TAG-linux-amd64.tar.gz
+RUN tar xvzf \
+        pandoc-$PANDOC_TAG-linux-amd64.tar.gz \
+        --strip-components 1 \
+        -C /usr/local
+
+RUN apk --no-cache add \
+        make \
+        pkgconfig \
+        autoconf \
+        automake \
+        libtool \
+        git \
+        gcc \
+        g++ \
+        libevent-dev \
+        openssl-dev \
+        c-ares-dev \
+        ca-certificates
+
+RUN git clone \
+        --branch $PGBOUNCER_TAG \
+        --recurse-submodules \
+        --single-branch \
+        --shallow-submodules \
+        --depth 1 \
+        --jobs 8 \
+        https://github.com/pgbouncer/pgbouncer.git /src/pgbouncer
+
+WORKDIR /src/pgbouncer
+
+RUN ./autogen.sh
+RUN ./configure \
+        --prefix=/pgbouncer \
+        --with-cares
+RUN make
+RUN make install
+
+
+FROM alpine:3.13
+
+LABEL maintainer="Woozy Masta <woozymasta@gmail.com>"
+
+WORKDIR /pgbouncer
+COPY --from=builder /pgbouncer /pgbouncer
+COPY ./entrypoint.sh /pgbouncer/entrypoint
+
+RUN apk --no-cache add \
+        bash \
+        coreutils \
+        libevent \
+        openssl \
+        postgresql-client \
+        c-ares && \
+    addgroup --gid 1000 pgbouncer && \
+    adduser --disabled-password \
+            --uid 1000 \
+            --shell /bin/bash \
+            --home /pgbouncer \
+            --ingroup pgbouncer \
+            pgbouncer && \
+    mkdir /pgbouncer/etc && \
+    chown -R 1000:0 /pgbouncer && \
+    chmod -R g+rw /pgbouncer/etc
+
+USER 1000
+
+ENTRYPOINT ["/pgbouncer/entrypoint"]

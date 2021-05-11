@@ -1,0 +1,19 @@
+FROM alpine:3.13 AS builder
+
+ARG EXPORTER_TAG=0.4.0
+
+WORKDIR /exporter
+RUN echo https://github.com/prometheus-community/pgbouncer_exporter/releases/download/v$EXPORTER_TAG/pgbouncer_exporter-$EXPORTER_TAG.linux-amd64.tar.gz
+RUN wget https://github.com/prometheus-community/pgbouncer_exporter/releases/download/v$EXPORTER_TAG/pgbouncer_exporter-$EXPORTER_TAG.linux-amd64.tar.gz
+RUN tar xvzf \
+        pgbouncer_exporter-$EXPORTER_TAG.linux-amd64.tar.gz \
+        pgbouncer_exporter-$EXPORTER_TAG.linux-amd64/pgbouncer_exporter \
+        --strip-components 1
+
+
+FROM scratch
+
+LABEL maintainer="Woozy Masta <woozymasta@gmail.com>"
+
+COPY --from=builder /exporter/pgbouncer_exporter /pgbouncer_exporter
+ENTRYPOINT ["/pgbouncer_exporter"]
