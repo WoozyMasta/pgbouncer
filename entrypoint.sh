@@ -29,7 +29,7 @@ psql_opt=(
 : "${PGBOUNCER_LISTEN_ADDR:=*}"
 : "${PGBOUNCER_LISTEN_PORT:=5432}"
 : "${PGBOUNCER_LOGFILE:=/dev/null}"
-: "${PGBOUNCER_PIDFILE:=/pgbouncer/pgbouncer.pid}"
+: "${PGBOUNCER_PIDFILE:=/pgbouncer/etc/pgbouncer.pid}"
 : "${PGBOUNCER_AUTH_TYPE:=md5}"
 : "${PGBOUNCER_AUTH_FILE:=/pgbouncer/etc/userlist.txt}"
 : "${PGBOUNCER_ADMIN_USERS:=$POSTGRES_USER}"
@@ -266,4 +266,4 @@ fi
 
 # Execute PgBouncer as main PID
 exec -a pgbouncer \
-  /pgbouncer/bin/pgbouncer --user=pgbouncer "$PGBOUNCER_CONFIG_FILE"
+  /pgbouncer/bin/pgbouncer "$PGBOUNCER_CONFIG_FILE"
